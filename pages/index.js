@@ -139,7 +139,7 @@ export default function Home() {
               }
               @media only screen and (max-width: 499px) {
                 .text1, .text2, .wallet {
-                  font-size: 1.2rem;
+                  font-size: 1rem;
                 }
               }
         `}</style>
