@@ -47,11 +47,11 @@ export default function Home() {
       const newUser = {
         wallet_addres: router.query.wallet
       };
-      setTimeout(function(){ setLoading(false) }, 750);
       axios.post(url_create, newUser)
         .then(function (response) {
         console.log("response:", response.data[0].quantity);
         setDrinkNo(response.data[0].quantity - 1);
+        setLoading(false);
         if (response.data[0].quantity == 0) {
           setIsDrinkNull(true);
           setDrinkNo(response.data[0].quantity);
@@ -60,6 +60,7 @@ export default function Home() {
         if(response.data[0].quantity > 0) {
           addSuccessNotification();
         }
+
       })
       .catch(function (error) {
         console.log(error);
