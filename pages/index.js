@@ -6,11 +6,11 @@ import { store } from 'react-notifications-component';
 const url_create = process.env.NEXT_PUBLIC_HOST_URL + "api/addReceiver";
 
 export default function Home() {
-    const [drinkNo, setDrinkNo] = useState();
+    const [drinkNo, setDrinkNo] = useState(); 
     const [isDrinkNull, setIsDrinkNull] = useState(false);
     const router = useRouter();
 
-    function addSuccessNotification() {
+    function addSuccessNotification() { //generates success notofication
       store.addNotification({
         title: "Sukces!",
         message: "Twój darmowy drink został odebrany.",
@@ -25,7 +25,7 @@ export default function Home() {
       });
     }
 
-    function addWarningNotofication() {
+    function addWarningNotofication() { //genarates error notofication
       store.addNotification({
         title: "Uwaga!",
         message: "Wykorzystałeś wszystkie darmowe drinki.",
@@ -47,40 +47,44 @@ export default function Home() {
 
       axios.post(url_create, newUser)
         .then(function (response) {
-        console.log("odpowiedz:", response.data[0].quantity);
+        console.log("response:", response.data[0].quantity);
         setDrinkNo(response.data[0].quantity - 1);
         if (response.data[0].quantity == 0) {
           setIsDrinkNull(true);
-          console.log("isDrinkNull w ifie", isDrinkNull);
           setDrinkNo(response.data[0].quantity);
+          addWarningNotofication();
+        }
+        if(response.data[0].quantity > 0) {
+          addSuccessNotification();
         }
       })
       .catch(function (error) {
         console.log(error);
       })
-      //isDrinkNull ? addWarningNotofication() : addSuccessNotification();
+      
       console.log("isDrinkNull", isDrinkNull);
     }, [router.query.wallet]);
     
-    function drawDrinks() {
-      let drinkiHtml = '';
+    function drawDrinks() { //generates html to render drink images
+      let drinksHtml = '';
       for(let i = 0; i < drinkNo; i++){
         const fileName = '/drink' + getRandomInt(1,5) + ".png";
-        drinkiHtml += `<img className="drink" src=${fileName} alt="drink" width="250" height="250" style="padding: 5px"></img>`;
+        drinksHtml += `<img className="drink" src=${fileName} alt="drink" width="250" height="250" style="padding: 5px"></img>`;
       }
-      return drinkiHtml;
+      return drinksHtml;
     }
 
-    function getRandomInt(min, max) {
+    function getRandomInt(min, max) { //generates random number in range of 1-5 to draw random drink image
       min = Math.ceil(min);
       max = Math.floor(max);
       return Math.floor(Math.random() * (max - min)) + min;
     }
+
     return (
         <div className="container">
             <Head>
               <title>Rozdajemy drinki!</title>
-              <link rel="icon" href="/nfc4.svg" />
+              <link rel="icon" href="/nfc5.svg" />
             </Head>
             <div className="text1">Użytkownikowi o portfelu:</div>
             <div className="wallet"><span>{router.query.wallet}</span></div>
@@ -109,9 +113,6 @@ export default function Home() {
               }
               img {
                 padding: 5px;
-              }
-              .drinki > div {
-                margin: 6px;
               }
               .drink {
                 width: 100px;
