@@ -1,0 +1,21 @@
+{
+  "name": "nfc-cards-esape",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@material-ui/core": "^4.12.1",
+    "animate.css": "^4.1.1",
+    "axios": "^0.21.1",
+    "mongodb": "^3.6.10",
+    "mongoose": "^5.13.2",
+    "next": "11.0.1",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "react-notifications-component": "^3.1.0"
+  }
+}
