@@ -10,6 +10,7 @@ export default function Home() {
     const [drinkNo, setDrinkNo] = useState(); 
     const [isDrinkNull, setIsDrinkNull] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [emptyResponse, setEmptyResponse] = useState(false);
     const [color, setColor] = useState("#f3841f");
     const router = useRouter();
 
@@ -28,10 +29,10 @@ export default function Home() {
       });
     }
 
-    function addWarningNotofication() { //genarates error notofication
+    function addWarningNotofication(msgTxt) { //genarates error notofication
       store.addNotification({
         title: "Uwaga!",
-        message: "Wykorzystałeś wszystkie darmowe drinki.",
+        message: msgTxt,
         type: "danger",
         container: "bottom-right",
         animationIn: ["animate__animated", "animate__fadeIn"],
@@ -49,18 +50,21 @@ export default function Home() {
       };
       axios.post(url_create, newUser)
         .then(function (response) {
-        console.log("response:", response.data[0].quantity);
-        setDrinkNo(response.data[0].quantity - 1);
-        setLoading(false);
-        if (response.data[0].quantity == 0) {
-          setIsDrinkNull(true);
-          setDrinkNo(response.data[0].quantity);
-          addWarningNotofication();
-        }
-        if(response.data[0].quantity > 0) {
-          addSuccessNotification();
-        }
-
+          console.log("response:", response.data.length);
+          setDrinkNo(response.data.length != 0 ? response.data[0].quantity - 1 : 0);
+          setLoading(false);
+          if(response.data.length == 0) {
+            addWarningNotofication("Użytkownik o podanym adresie portfela nie istenieje.");
+            setEmptyResponse(true);
+          }
+          else if (response.data.length != 0 && response.data[0].quantity == 0) {
+            setIsDrinkNull(true);
+            setDrinkNo(response.data[0].quantity);
+            addWarningNotofication("Wykorzystałeś wszystkie darmowe drinki.");
+          }
+          else if(response.data[0].quantity > 0) {
+            addSuccessNotification();
+          }
       })
       .catch(function (error) {
         console.log(error);
@@ -93,9 +97,9 @@ export default function Home() {
             <ClipLoader color={color} loading={loading} size={75} />
             {loading ? null : 
               <div className="container"> 
-                <div className="text1">Użytkownikowi o portfelu:</div>
+                <div className="text1">{emptyResponse ? "Użytkownik":"Użytkownikowi"} o portfelu:</div>
                 <div className="wallet"><span>{router.query.wallet}</span></div>
-                <div className="text2">pozostała następująca liczba drinków: <span>{drinkNo}</span></div>
+                <div className="text2">{emptyResponse ? "Nie istenieje!":"pozostała następująca liczba drinków: "}<span>{emptyResponse ? null : drinkNo}</span></div>
                 <div className="drinki" dangerouslySetInnerHTML={{__html: drawDrinks()}}></div>
               </div>
             } 
