@@ -99,7 +99,8 @@ export default function Home() {
               <div className="container"> 
                 <div className="text1">{emptyResponse ? "Użytkownik":"Użytkownikowi"} o portfelu:</div>
                 <div className="wallet"><span>{router.query.wallet}</span></div>
-                <div className="text2">{emptyResponse ? "Nie istenieje!":"pozostała następująca liczba drinków: "}<span>{emptyResponse ? null : drinkNo}</span></div>
+                <div className="text2">{emptyResponse ? "Nie istenieje!":"pozostała następująca liczba drinków: "}<span>{(emptyResponse || drinkNo == 0) ? null : drinkNo}</span></div>
+                <div className="zero">{!emptyResponse && drinkNo == 0 ? "0" : null}</div>
                 <div className="drinki" dangerouslySetInnerHTML={{__html: drawDrinks()}}></div>
               </div>
             } 
@@ -113,6 +114,9 @@ export default function Home() {
                 justify-content: center;
                 align-items: center;
                 width: 100%;
+              }
+              .zero {
+                font-size: 3rem;
               }
               .text1, .text2, .wallet {
                 font-size: 1.5rem;
@@ -132,7 +136,7 @@ export default function Home() {
                 width: 100px;
                 height: 100px;
               }
-              span {
+              span, .zero {
                 color: rgba(243, 132, 31, 1);
               }
               .wallet {
