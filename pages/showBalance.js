@@ -2,47 +2,15 @@ import { useRouter} from 'next/router'
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import Head from 'next/head'
-import { store } from 'react-notifications-component';
 import ClipLoader from "react-spinners/ClipLoader";
-const url_create = process.env.NEXT_PUBLIC_HOST_URL + "api/useDrink";
+const url_create = process.env.NEXT_PUBLIC_HOST_URL + "api/getOneEntry";
 
 export default function Home() {
     const [drinkNo, setDrinkNo] = useState(); 
-    const [isDrinkNull, setIsDrinkNull] = useState(false);
     const [loading, setLoading] = useState(true);
     const [emptyResponse, setEmptyResponse] = useState(false);
     const [color, setColor] = useState("#f3841f");
     const router = useRouter();
-
-    function addSuccessNotification() { //generates success notofication
-      store.addNotification({
-        title: "Sukces!",
-        message: "Twój darmowy drink został odebrany.",
-        type: "success",
-        container: "bottom-right",
-        animationIn: ["animate__animated", "animate__fadeIn"],
-        animationOut: ["animate__animated", "animate__fadeOut"],
-        dismiss: {
-          duration: 10000,
-          showIcon: true,
-        }
-      });
-    }
-
-    function addWarningNotofication(msgTxt) { //genarates error notofication
-      store.addNotification({
-        title: "Uwaga!",
-        message: msgTxt,
-        type: "danger",
-        container: "bottom-right",
-        animationIn: ["animate__animated", "animate__fadeIn"],
-        animationOut: ["animate__animated", "animate__fadeOut"],
-        dismiss: {
-          duration: 10000,
-          showIcon: true,
-        }
-      });
-    }
 
     useEffect(() => {
       const newUser = {
@@ -51,32 +19,28 @@ export default function Home() {
       axios.post(url_create, newUser)
         .then(function (response) {
           console.log("response:", response.data.length);
-          setDrinkNo(response.data.length != 0 ? response.data[0].quantity - 1 : 0);
+          setDrinkNo(response.data.length != 0 ? response.data[0].quantity: 0);
           setLoading(false);
           if(response.data.length == 0) {
-            addWarningNotofication("Użytkownik o podanym adresie portfela nie istenieje.");
             setEmptyResponse(true);
-          }
-          else if (response.data.length != 0 && response.data[0].quantity == 0) {
-            setIsDrinkNull(true);
-            setDrinkNo(response.data[0].quantity);
-            addWarningNotofication("Wykorzystałeś wszystkie darmowe drinki.");
-          }
-          else if(response.data[0].quantity > 0) {
-            addSuccessNotification();
           }
       })
       .catch(function (error) {
         console.log(error);
       })
       
-      console.log("isDrinkNull", isDrinkNull);
     }, [router.query.wallet]);
+
+    function renderDrinkText(drinkNumber) { //odmiana rzeczownika 
+      if (drinkNumber == 1) return "drink";
+      else if (drinkNumber == 2 || drinkNumber == 3 || drinkNumber == 4) return "drinki";
+      else return "drinków";
+    }
     
     function drawDrinks() { //generates html to render drink images
       let drinksHtml = '';
       for(let i = 0; i < drinkNo; i++){
-        const fileName = '/drink' + getRandomInt(1,5) + ".png";
+        const fileName = '/drink' + getRandomInt(1,5) + "A.png";
         drinksHtml += `<img className="drink" src=${fileName} alt="drink" width="250" height="250" style="padding: 5px"></img>`;
       }
       return drinksHtml;
@@ -95,14 +59,26 @@ export default function Home() {
               <link rel="icon" href="/nfc5.svg" />
             </Head>
             <ClipLoader color={color} loading={loading} size={75} />
-            {loading ? null : 
+            {loading ? null : (
+              emptyResponse ? 
               <div className="container"> 
-                <div className="text1">{emptyResponse ? "Użytkownik":"Użytkownikowi"} o portfelu:</div>
+                <div className="text1">Użytkownik o portfelu:</div>
                 <div className="wallet"><span>{router.query.wallet}</span></div>
-                <div className="text2">{emptyResponse ? "Nie istenieje!":"pozostała następująca liczba drinków: "}<span>{(emptyResponse || drinkNo == 0) ? null : drinkNo}</span></div>
-                <div className="zero">{!emptyResponse && drinkNo == 0 ? "0" : null}</div>
-                <div className="drinki" dangerouslySetInnerHTML={{__html: drawDrinks()}}></div>
+                <div className="text2">Nie istenieje!</div>
               </div>
+              :
+              (
+              drinkNo != 0 ?
+              <div className="container"> 
+                <div className="text1">Masz jeszcze <span>{drinkNo}</span> {renderDrinkText(drinkNo)} do odebrania!</div>
+                <div className="drinki" dangerouslySetInnerHTML={{__html: drawDrinks()}}></div>
+              </div> 
+              :
+              <div className="container"> 
+                <div className="text1">Wykorzystałeś wszystkie darmowe drinki.</div>
+                <div className="text3">:(</div>
+              </div> 
+              ))
             } 
         <style jsx>{`
             .container {
@@ -115,11 +91,11 @@ export default function Home() {
                 align-items: center;
                 width: 100%;
               }
-              .zero {
-                font-size: 3rem;
-              }
               .text1, .text2, .wallet {
                 font-size: 1.5rem;
+              }
+              .text3 {
+                font-size: 3rem;
               }
               .drinki {
                 width: 75%;
@@ -136,8 +112,9 @@ export default function Home() {
                 width: 100px;
                 height: 100px;
               }
-              span, .zero {
+              span {
                 color: rgba(243, 132, 31, 1);
+                font-weight: 600;
               }
               .wallet {
                 padding: 5px;
