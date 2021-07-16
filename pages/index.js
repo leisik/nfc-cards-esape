@@ -17,7 +17,7 @@ export default function Home() {
     function addSuccessNotification() { //generates success notofication
       store.addNotification({
         title: "Sukces!",
-        message: "Twój darmowy drink został odebrany.",
+        message: "Darmowy drink został odebrany.",
         type: "success",
         container: "bottom-right",
         animationIn: ["animate__animated", "animate__fadeIn"],
@@ -60,7 +60,7 @@ export default function Home() {
           else if (response.data.length != 0 && response.data[0].quantity == 0) {
             setIsDrinkNull(true);
             setDrinkNo(response.data[0].quantity);
-            addWarningNotofication("Wykorzystałeś wszystkie darmowe drinki.");
+            addWarningNotofication("Wykorzystano wszystkie darmowe drinki.");
           }
           else if(response.data[0].quantity > 0) {
             addSuccessNotification();
@@ -95,14 +95,23 @@ export default function Home() {
               <link rel="icon" href="/nfc5.svg" />
             </Head>
             <ClipLoader color={color} loading={loading} size={75} />
-            {loading ? null : 
+            {loading ? null : (
+              drinkNo != 0 ?
               <div className="container"> 
-                <div className="text1">{emptyResponse ? "Użytkownik":"Użytkownikowi"} o portfelu:</div>
+                <div className="text1">{emptyResponse || drinkNo == 0 ? "Użytkownik":"Użytkownikowi"} o portfelu:</div>
                 <div className="wallet"><span>{router.query.wallet}</span></div>
                 <div className="text2">{emptyResponse ? "Nie istenieje!":"pozostała następująca liczba drinków: "}<span>{(emptyResponse || drinkNo == 0) ? null : drinkNo}</span></div>
                 <div className="zero">{!emptyResponse && drinkNo == 0 ? "0" : null}</div>
                 <div className="drinki" dangerouslySetInnerHTML={{__html: drawDrinks()}}></div>
               </div>
+              :
+              <div className="container"> 
+                <div className="text1">Użytkownik o portfelu:</div>
+                <div className="wallet"><span>{router.query.wallet}</span></div>
+                <div className="text2">wykorzystał wszystkie darmowe drinki.</div>
+                <div className="text3">:(</div>
+              </div>
+            )
             } 
         <style jsx>{`
             .container {
@@ -120,6 +129,9 @@ export default function Home() {
               }
               .text1, .text2, .wallet {
                 font-size: 1.5rem;
+              }
+              .text3 {
+                font-size: 3rem;
               }
               .drinki {
                 width: 75%;
