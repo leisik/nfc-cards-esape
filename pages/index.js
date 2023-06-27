@@ -19,7 +19,7 @@ export default function Home() {
         title: "Sukces!",
         message: "Darmowy drink został odebrany.",
         type: "success",
-        container: "bottom-right",
+        container: "top-right",
         animationIn: ["animate__animated", "animate__fadeIn"],
         animationOut: ["animate__animated", "animate__fadeOut"],
         dismiss: {
@@ -34,7 +34,7 @@ export default function Home() {
         title: "Uwaga!",
         message: msgTxt,
         type: "danger",
-        container: "bottom-right",
+        container: "top-right",
         animationIn: ["animate__animated", "animate__fadeIn"],
         animationOut: ["animate__animated", "animate__fadeOut"],
         dismiss: {
@@ -50,7 +50,6 @@ export default function Home() {
       };
       axios.post(url_create, newUser)
         .then(function (response) {
-          console.log("response:", response.data.length);
           setDrinkNo(response.data.length != 0 ? response.data[0].quantity - 1 : 0);
           setLoading(false);
           if(response.data.length == 0) {
@@ -70,7 +69,6 @@ export default function Home() {
         console.log(error);
       })
       
-      console.log("isDrinkNull", isDrinkNull);
     }, [router.query.wallet]);
     
     function drawDrinks() { //generates html to render drink images

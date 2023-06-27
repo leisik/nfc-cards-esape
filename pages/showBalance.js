@@ -18,7 +18,6 @@ export default function Home() {
       };
       axios.post(url_create, newUser)
         .then(function (response) {
-          console.log("response:", response.data.length);
           setDrinkNo(response.data.length != 0 ? response.data[0].quantity: 0);
           setLoading(false);
           if(response.data.length == 0) {

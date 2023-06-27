@@ -1,5 +1,5 @@
 import { connectToDatabase } from "../../util/mongodb";
-const database = process.env.NEXT_PUBLIC_DATABASE;
+const database = process.env.NEXT_PUBLIC_COLLECTION;
 
 export default async (req, res) => {
     const { db } = await connectToDatabase();

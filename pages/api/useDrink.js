@@ -1,5 +1,5 @@
 import { connectToDatabase } from "../../util/mongodb";
-const database = process.env.NEXT_PUBLIC_DATABASE;
+const database = process.env.NEXT_PUBLIC_COLLECTION;
 
 export default async (req, res) => {
     const { db } = await connectToDatabase();
@@ -10,7 +10,7 @@ export default async (req, res) => {
         {
             const result = await users.find({ "wallet_addres" : wallet_addres }).toArray(); //query to get quantity (number of drinks available) of the customer
             if(result.length == 0){
-                console.log("pusta tablica");
+                console.log("empty array");
             }
             if(result.length != 0) {
                 if(result[0].quantity > 0 ) {
